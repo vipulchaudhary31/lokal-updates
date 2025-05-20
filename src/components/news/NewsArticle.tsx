@@ -32,7 +32,7 @@ export const NewsArticle: React.FC<NewsArticleProps> = ({
             </p>
           </div>
         </div>
-        <div className="flex w-full items-center gap-4 pb-[20px] px-4">
+        <div className="flex w-full items-center gap-4 pb-[10px] px-4">
           <div className="self-stretch flex min-w-60 w-full items-center justify-between flex-1 shrink basis-[0%] my-auto">
             <div className="self-stretch flex min-w-60 flex-col items-stretch text-[13px] text-[#989898] font-normal leading-none justify-center flex-1 shrink basis-[0%] my-auto">
               <div className="flex max-w-full w-[248px] flex-col justify-center">
