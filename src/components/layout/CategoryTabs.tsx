@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 const categories = [
@@ -11,7 +12,7 @@ const categories = [
 
 export const CategoryTabs = () => {
   return (
-    <nav className="overflow-x-auto flex min-h-12 w-full items-center gap-3 pl-3 py-1.5">
+    <nav className="overflow-x-auto scrollbar-hide flex min-h-12 w-full items-center gap-3 pl-3 py-1.5">
       {categories.map((category) => (
         <button
           key={category.id}
