@@ -4,6 +4,7 @@ import { CategoryTabs } from './CategoryTabs';
 import { BottomNavigation } from './BottomNavigation';
 import { LocationModal } from './LocationModal';
 import { CategoriesModal } from './CategoriesModal';
+import { LoadingSkeleton } from './LoadingSkeleton';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -12,10 +13,11 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   const [categoriesModalOpen, setCategoriesModalOpen] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState<string>('बेंगलुरु शहरी');
-  const [selectedConstituency, setSelectedConstituency] = useState<string>('');
+  const [selectedLocation, setSelectedLocation] = useState<string>('मुंबई शहर');
+  const [selectedConstituency, setSelectedConstituency] = useState<string>('मुंबई दक्षिण');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [activeCategory, setActiveCategory] = useState<string>('1'); // Default to first tab
+  const [isLocationLoading, setIsLocationLoading] = useState(false);
 
   const handleLocationSelect = (location: string, constituency?: string) => {
     setSelectedLocation(location);
@@ -34,10 +36,17 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     }
   };
 
+  const handleLoadingChange = (loading: boolean) => {
+    setIsLocationLoading(loading);
+  };
+
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-gray-100 p-4">
       <div className="bg-black rounded-[40px] p-3 shadow-xl max-w-[390px] mx-auto">
         <div className="bg-white max-w-[360px] overflow-hidden rounded-[32px] relative">
+          {/* Loading Skeleton Overlay */}
+          {isLocationLoading && <LoadingSkeleton />}
+          
           <header className="bg-[rgba(25,29,28,1)] w-full rounded-t-[32px]">
             <StatusBar />
             <CategoryTabs
@@ -56,7 +65,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               if (React.isValidElement(child)) {
                 return React.cloneElement(child, { 
                   activeCategory, 
-                  selectedCategory 
+                  selectedCategory,
+                  selectedLocation,
+                  selectedConstituency 
                 } as any);
               }
               return child;
@@ -71,6 +82,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             onSelect={handleLocationSelect}
             selectedLocation={selectedLocation}
             selectedConstituency={selectedConstituency}
+            onLoadingChange={handleLoadingChange}
           />
           <CategoriesModal
             open={categoriesModalOpen}

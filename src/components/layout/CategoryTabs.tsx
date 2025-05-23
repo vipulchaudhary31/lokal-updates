@@ -42,22 +42,44 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
         className="flex items-center gap-2 px-3 py-2 mr-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
       >
         <img src="/icons/icon-location.svg" alt="Location" className="w-4 h-4" />
-        <div className="flex flex-col items-start">
-          <span className="text-white text-xs font-medium leading-none">
-            {selectedLocation || 'बेंगलुरु'}
-          </span>
-          {selectedConstituency && (
-            <span className="text-white/60 text-xs leading-none">
-              {selectedConstituency}
-            </span>
-          )}
-        </div>
         <img src="/icons/icon-dropdown.svg" alt="Dropdown" className="w-3 h-3" />
       </button>
 
       {/* Category Tabs */}
       <nav className="overflow-x-auto scrollbar-hide flex min-h-12 w-full items-center gap-3 py-1.5 relative">
-        {categories.map((category) => (
+        {/* First category: माझी बातमी */}
+        <button
+          key={categories[0].id}
+          className={`self-stretch min-h-9 text-sm text-white font-${activeCategory === categories[0].id.toString() ? 'semibold' : 'normal'} whitespace-nowrap text-center leading-none my-auto pt-0.5 px-2 rounded-[61px]`}
+          onClick={() => handleTabClick(categories[0].id)}
+        >
+          {categories[0].name}
+        </button>
+
+        {/* District Category - Only show if location is selected */}
+        {selectedLocation && selectedLocation !== 'बेंगलुरु' && (
+          <button
+            key="district"
+            className={`self-stretch min-h-9 text-sm text-white font-${activeCategory === 'district' ? 'semibold' : 'normal'} whitespace-nowrap text-center leading-none my-auto pt-0.5 px-2 rounded-[61px]`}
+            onClick={() => handleTabClick('district')}
+          >
+            {selectedLocation}
+          </button>
+        )}
+
+        {/* Constituency Category - Only show if constituency is selected */}
+        {selectedConstituency && (
+          <button
+            key="constituency"
+            className={`self-stretch min-h-9 text-sm text-white font-${activeCategory === 'constituency' ? 'semibold' : 'normal'} whitespace-nowrap text-center leading-none my-auto pt-0.5 px-2 rounded-[61px]`}
+            onClick={() => handleTabClick('constituency')}
+          >
+            {selectedConstituency}
+          </button>
+        )}
+
+        {/* Rest of the categories (starting from index 1) */}
+        {categories.slice(1).map((category) => (
           <button
             key={category.id}
             className={`self-stretch min-h-9 text-sm text-white font-${activeCategory === category.id.toString() ? 'semibold' : 'normal'} whitespace-nowrap text-center leading-none my-auto pt-0.5 px-2 rounded-[61px]`}
@@ -66,6 +88,7 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
             {category.name}
           </button>
         ))}
+
         <button 
           className="self-stretch flex min-h-9 items-center gap-1 justify-center my-auto pt-0.5 px-2 rounded-[61px]"
           onClick={openCategoriesModal}

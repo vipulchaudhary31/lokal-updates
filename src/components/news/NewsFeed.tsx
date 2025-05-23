@@ -14,6 +14,8 @@ interface NewsData {
 interface NewsFeedProps {
   activeCategory: string;
   selectedCategory?: string;
+  selectedLocation?: string;
+  selectedConstituency?: string;
 }
 
 // Sample news data for different categories
@@ -71,10 +73,33 @@ const newsDatabase: Record<string, Omit<NewsData, 'imageUrl'>[]> = {
       author: 'Health Expert',
       timeAgo: '5 hours ago'
     }
+  ],
+  'जिल्हा बातम्या': [
+    {
+      id: '7',
+      title: 'स्थानीय विकास योजनाओं में तेजी, जिला प्रशासन की नई पहल',
+      content: 'जिला प्रशासन ने स्थानीय विकास के लिए नई योजनाओं का शुभारंभ किया है। इससे क्षेत्रीय विकास में गति आने की उम्मीद है।',
+      author: 'District Correspondent',
+      timeAgo: '1 hour ago'
+    }
+  ],
+  'मतदारसंघ बातम्या': [
+    {
+      id: '8',
+      title: 'निर्वाचन क्षेत्रातील विकास कामांना गती, नागरिकांच्या समस्यांचे निराकरण',
+      content: 'स्थानीय प्रतिनिधींनी निर्वाचन क्षेत्रातील विकास कामांवर लक्ष केंद्रित करून नागरिकांच्या मुलभूत समस्यांचे निराकरण करण्याची घोषणा केली आहे।',
+      author: 'Constituency Reporter',
+      timeAgo: '30 mins ago'
+    }
   ]
 };
 
-export const NewsFeed: React.FC<NewsFeedProps> = ({ activeCategory, selectedCategory }) => {
+export const NewsFeed: React.FC<NewsFeedProps> = ({ 
+  activeCategory, 
+  selectedCategory, 
+  selectedLocation, 
+  selectedConstituency 
+}) => {
   const [newsData, setNewsData] = useState<NewsData[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -87,24 +112,56 @@ export const NewsFeed: React.FC<NewsFeedProps> = ({ activeCategory, selectedCate
       
       try {
         // Get news data for the category or use default
-        const rawNewsData = newsDatabase[currentCategory] || newsDatabase['माझी बातमी'] || [];
+        let rawNewsData = newsDatabase[currentCategory] || [];
+        
+        // Handle district and constituency specific content
+        if (activeCategory === 'district' && selectedLocation) {
+          rawNewsData = newsDatabase['जिल्हा बातम्या'] || [];
+          // Customize title to include district name
+          rawNewsData = rawNewsData.map(news => ({
+            ...news,
+            title: `${selectedLocation}: ${news.title}`
+          }));
+        } else if (activeCategory === 'constituency' && selectedConstituency) {
+          rawNewsData = newsDatabase['मतदारसंघ बातम्या'] || [];
+          // Customize title to include constituency name
+          rawNewsData = rawNewsData.map(news => ({
+            ...news,
+            title: `${selectedConstituency}: ${news.title}`
+          }));
+        }
         
         // If no specific news data exists, create generic news with different images
         let newsToShow = rawNewsData;
         if (rawNewsData.length === 0) {
+          let categoryName = currentCategory;
+          if (activeCategory === 'district' && selectedLocation) {
+            categoryName = selectedLocation;
+          } else if (activeCategory === 'constituency' && selectedConstituency) {
+            categoryName = selectedConstituency;
+          }
+          
           newsToShow = [{
             id: Date.now().toString(),
-            title: `${currentCategory} संबंधित ताज्या बातम्या`,
-            content: `${currentCategory} विभागातील महत्वाच्या घडामोडींची माहिती येथे उपलब्ध आहे. या विषयावरील सर्वाधिक वाचल्या जाणाऱ्या बातम्या आणि अद्यतने येथे वाचा.`,
+            title: `${categoryName} संबंधित ताज्या बातम्या`,
+            content: `${categoryName} विभागातील महत्वाच्या घडामोडींची माहिती येथे उपलब्ध आहे. या विषयावरील सर्वाधिक वाचल्या जाणाऱ्या बातम्या आणि अद्यतने येथे वाचा.`,
             author: 'News Desk',
             timeAgo: 'अभी'
           }];
         }
 
+        // Determine image category
+        let imageCategory = currentCategory;
+        if (activeCategory === 'district') {
+          imageCategory = 'कर्नाटक'; // Use Karnataka images for district news
+        } else if (activeCategory === 'constituency') {
+          imageCategory = 'राष्ट्रीय'; // Use national images for constituency news
+        }
+
         // Fetch images for each news item
         const newsWithImages = await Promise.all(
           newsToShow.map(async (news) => {
-            const imageUrl = await getImageForCategory(currentCategory);
+            const imageUrl = await getImageForCategory(imageCategory);
             return {
               ...news,
               imageUrl
@@ -131,7 +188,7 @@ export const NewsFeed: React.FC<NewsFeedProps> = ({ activeCategory, selectedCate
     };
 
     loadNewsForCategory();
-  }, [currentCategory]);
+  }, [currentCategory, activeCategory, selectedLocation, selectedConstituency]);
 
   if (loading) {
     return (
@@ -165,7 +222,9 @@ const getActiveCategoryName = (activeTab: string | number): string => {
     '3': 'राष्ट्रीय',
     '4': 'व्हिडिओ',
     '5': 'मनोरंजन',
-    '6': 'जीवनशैली'
+    '6': 'जीवनशैली',
+    'district': 'जिल्हा बातम्या',
+    'constituency': 'मतदारसंघ बातम्या'
   };
   
   return categoryMap[activeTab.toString()] || 'माझी बातमी';
