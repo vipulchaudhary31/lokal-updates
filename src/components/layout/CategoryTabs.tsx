@@ -11,13 +11,13 @@ const categories = [
 
 interface CategoryTabsProps {
   selectedLocation: string;
-  setSelectedLocation: (loc: string) => void;
+  setSelectedLocation: (location: string) => void;
   openLocationModal: () => void;
-  selectedConstituency?: string;
+  selectedConstituency: string;
   openCategoriesModal: () => void;
-  selectedCategory?: string;
+  selectedCategory: string;
   activeCategory: string;
-  onTabChange: (tabId: string) => void;
+  onTabChange: (id: string) => void;
 }
 
 export const CategoryTabs: React.FC<CategoryTabsProps> = ({ 
@@ -30,6 +30,8 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
   activeCategory,
   onTabChange
 }) => {
+  const baseUrl = import.meta.env.BASE_URL;
+  
   const handleTabClick = (id: number | string) => {
     onTabChange(id.toString());
   };
@@ -41,8 +43,8 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
         onClick={openLocationModal}
         className="flex items-center gap-2 px-3 py-2 mr-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
       >
-        <img src="/icons/icon-location.svg" alt="Location" className="w-4 h-4" />
-        <img src="/icons/icon-dropdown.svg" alt="Dropdown" className="w-3 h-3" />
+        <img src={`${baseUrl}icons/icon-location.svg`} alt="Location" className="w-4 h-4" />
+        <img src={`${baseUrl}icons/icon-dropdown.svg`} alt="Dropdown" className="w-3 h-3" />
       </button>
 
       {/* Category Tabs */}
@@ -97,7 +99,7 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
             {selectedCategory || 'सर्व श्रेणी'}
           </span>
           <div className="self-stretch flex items-center justify-center w-3 my-auto">
-            <img src="/icons/icon-dropdown.svg" alt="Dropdown" className="w-3 h-3" />
+            <img src={`${baseUrl}icons/icon-dropdown.svg`} alt="Dropdown" className="w-3 h-3" />
           </div>
         </button>
       </nav>
