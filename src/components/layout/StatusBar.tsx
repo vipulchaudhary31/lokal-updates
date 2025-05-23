@@ -10,8 +10,8 @@ export const StatusBar = () => {
           <span className="text-xs font-medium">9:30</span>
         </div>
         <div className="flex items-center gap-3 justify-end">
-          <Signal className="h-3 w-3 text-[#1EAEDB]" strokeWidth={1.5} />
-          <Wifi className="h-3 w-3 text-[#1EAEDB]" strokeWidth={1.5} />
+          <Signal className="h-3 w-3 text-[#FFFFFF]" strokeWidth={1.5} />
+          <Wifi className="h-3 w-3 text-[#FFFFFF]" strokeWidth={1.5} />
           <Battery className="h-3.5 w-3.5" strokeWidth={1.5} />
         </div>
       </div>
