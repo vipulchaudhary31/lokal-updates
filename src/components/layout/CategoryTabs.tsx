@@ -58,8 +58,8 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
           {categories[0].name}
         </button>
 
-        {/* District Category - Only show if location is selected */}
-        {selectedLocation && selectedLocation !== 'बेंगलुरु' && (
+        {/* District Category - Only show if location is selected and not default */}
+        {selectedLocation && selectedLocation !== 'बेंगलुरु' && selectedLocation !== '' && (
           <button
             key="district"
             className={`self-stretch min-h-9 text-sm text-white font-${activeCategory === 'district' ? 'semibold' : 'normal'} whitespace-nowrap text-center leading-none my-auto pt-0.5 px-2 rounded-[61px]`}
@@ -69,8 +69,8 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
           </button>
         )}
 
-        {/* Constituency Category - Only show if constituency is selected */}
-        {selectedConstituency && (
+        {/* Constituency Category - Only show if constituency is actually selected and not empty */}
+        {selectedConstituency && selectedConstituency !== '' && (
           <button
             key="constituency"
             className={`self-stretch min-h-9 text-sm text-white font-${activeCategory === 'constituency' ? 'semibold' : 'normal'} whitespace-nowrap text-center leading-none my-auto pt-0.5 px-2 rounded-[61px]`}

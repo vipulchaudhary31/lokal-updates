@@ -145,7 +145,7 @@ const maharashtraDistricts = [
 ];
 
 // Get recent searches from localStorage
-const getRecentSearches = (): {district: string, constituency: string}[] => {
+const getRecentSearches = (): {district: string, constituency?: string}[] => {
   try {
     const recent = localStorage.getItem('recentLocationSearches');
     return recent ? JSON.parse(recent) : [];
@@ -155,7 +155,7 @@ const getRecentSearches = (): {district: string, constituency: string}[] => {
 };
 
 // Save to recent searches
-const saveToRecentSearches = (district: string, constituency: string) => {
+const saveToRecentSearches = (district: string, constituency?: string) => {
   try {
     const recent = getRecentSearches();
     const newSearch = { district, constituency };
@@ -193,7 +193,8 @@ export const LocationModal: React.FC<LocationModalProps> = ({
   const [search, setSearch] = useState('');
   const [selectedDistrict, setSelectedDistrict] = useState<typeof maharashtraDistricts[0] | null>(null);
   const [showConstituencies, setShowConstituencies] = useState(false);
-  const [recentSearches, setRecentSearches] = useState<{district: string, constituency: string}[]>([]);
+  const [editMode, setEditMode] = useState(false);
+  const [recentSearches, setRecentSearches] = useState<{district: string, constituency?: string}[]>([]);
   const [isLoadingLocation, setIsLoadingLocation] = useState(false);
   const [locationError, setLocationError] = useState('');
 
@@ -204,15 +205,45 @@ export const LocationModal: React.FC<LocationModalProps> = ({
       setShowConstituencies(false);
       setLocationError('');
       setRecentSearches(getRecentSearches());
+      
+      // Check if user has existing selection - enter edit mode
+      if (selectedLocation) {
+        setEditMode(true);
+        // Find the district object for the selected location
+        const currentDistrict = maharashtraDistricts.find(d => d.name === selectedLocation);
+        if (currentDistrict) {
+          setSelectedDistrict(currentDistrict);
+        }
+      } else {
+        setEditMode(false);
+      }
     }
-  }, [open]);
+  }, [open, selectedLocation]);
 
   if (!open) return null;
 
   const handleDistrictSelect = (district: typeof maharashtraDistricts[0]) => {
     setSelectedDistrict(district);
     setShowConstituencies(true);
+    setEditMode(false);
     setSearch('');
+  };
+
+  const handleDistrictOnlySelect = (district: typeof maharashtraDistricts[0]) => {
+    // Close modal immediately
+    onClose();
+    
+    // Start loading after modal closes
+    setTimeout(() => {
+      onLoadingChange?.(true);
+      saveToRecentSearches(district.name);
+      
+      // Simulate loading delay
+      setTimeout(() => {
+        onSelect(district.name, undefined); // No constituency selected
+        onLoadingChange?.(false);
+      }, 1500);
+    }, 100);
   };
 
   const handleConstituencySelect = (constituency: string) => {
@@ -234,7 +265,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
     }
   };
 
-  const handleRecentSelect = (recent: {district: string, constituency: string}) => {
+  const handleRecentSelect = (recent: {district: string, constituency?: string}) => {
     // Close modal immediately
     onClose();
     
@@ -289,9 +320,33 @@ export const LocationModal: React.FC<LocationModalProps> = ({
   };
 
   const handleBack = () => {
-    setShowConstituencies(false);
-    setSelectedDistrict(null);
+    if (editMode && selectedLocation) {
+      // If in edit mode, go back to edit mode view
+      setShowConstituencies(false);
+      setSelectedDistrict(maharashtraDistricts.find(d => d.name === selectedLocation) || null);
+      setEditMode(true);
+    } else {
+      // Normal back to district selection
+      setShowConstituencies(false);
+      setSelectedDistrict(null);
+      setEditMode(false);
+    }
     setSearch('');
+  };
+
+  const handleEditDistrict = () => {
+    setEditMode(false);
+    setSelectedDistrict(null);
+    setShowConstituencies(false);
+    setSearch('');
+  };
+
+  const handleEditConstituency = () => {
+    if (selectedDistrict) {
+      setShowConstituencies(true);
+      setEditMode(false);
+      setSearch('');
+    }
   };
 
   // Enhanced search with English to Marathi translation
@@ -316,7 +371,7 @@ export const LocationModal: React.FC<LocationModalProps> = ({
     searchWithTranslation(search, selectedDistrict.constituencies, selectedDistrict.constituenciesEnglish) : [];
 
   const showSearchResults = search.length > 0;
-  const hasCurrentSelection = selectedLocation && selectedConstituency;
+  const hasCurrentSelection = selectedLocation;
 
   // Create combined recent searches with current selection at top
   const combinedRecentSearches = () => {
@@ -350,6 +405,18 @@ export const LocationModal: React.FC<LocationModalProps> = ({
                 <p className="text-sm text-gray-500">{selectedDistrict?.name}</p>
               </div>
             </div>
+          ) : editMode ? (
+            <div className="flex items-center gap-3">
+              <button onClick={() => setEditMode(false)} className="p-1 rounded-full hover:bg-gray-100">
+                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">स्थान संपादित करें</h2>
+                <p className="text-sm text-gray-500">वर्तमान चयन</p>
+              </div>
+            </div>
           ) : (
             <h2 className="text-lg font-semibold text-gray-900">स्थान चुनें</h2>
           )}
@@ -361,28 +428,116 @@ export const LocationModal: React.FC<LocationModalProps> = ({
         </div>
 
         <div className="flex-1 overflow-y-auto scrollbar-hide">
-          {/* Search Bar */}
-          <div className="p-4 border-b border-gray-100">
-            <div className="relative">
-              <input
-                type="text"
-                className="w-full rounded-lg border border-gray-300 py-3 pl-10 pr-4 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder={showConstituencies ? "निर्वाचन क्षेत्र खोजें..." : "जिला खोजें..."}
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-              />
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
+          {/* Search Bar - Only show when not in edit mode */}
+          {!editMode && (
+            <div className="p-4 border-b border-gray-100">
+              <div className="relative">
+                <input
+                  type="text"
+                  className="w-full rounded-lg border border-gray-300 py-3 pl-10 pr-4 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder={showConstituencies ? "निर्वाचन क्षेत्र खोजें..." : "जिला खोजें..."}
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                />
+                <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Content */}
           <div className="flex-1">
-            {showConstituencies ? (
+            {editMode ? (
+              /* Edit Mode - Show current selection with options to change */
+              <div className="p-4">
+                <div className="space-y-3">
+                  {/* Current District */}
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className="text-sm text-blue-600 font-medium mb-1">चयनित जिला</div>
+                        <div className="text-lg font-semibold text-blue-900">{selectedLocation}</div>
+                      </div>
+                      <button 
+                        onClick={handleEditDistrict}
+                        className="px-3 py-1.5 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
+                      >
+                        बदलें
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Current Constituency */}
+                  <div className={`border rounded-lg p-4 ${selectedConstituency ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200'}`}>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <div className={`text-sm font-medium mb-1 ${selectedConstituency ? 'text-green-600' : 'text-gray-500'}`}>
+                          निर्वाचन क्षेत्र {!selectedConstituency && '(वैकल्पिक)'}
+                        </div>
+                        <div className={`text-lg font-semibold ${selectedConstituency ? 'text-green-900' : 'text-gray-400'}`}>
+                          {selectedConstituency || 'चयनित नहीं'}
+                        </div>
+                      </div>
+                      <button 
+                        onClick={handleEditConstituency}
+                        className={`px-3 py-1.5 text-sm rounded-md transition-colors ${
+                          selectedConstituency 
+                            ? 'bg-green-600 text-white hover:bg-green-700' 
+                            : 'bg-blue-600 text-white hover:bg-blue-700'
+                        }`}
+                      >
+                        {selectedConstituency ? 'बदलें' : 'जोड़ें'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-3 pt-4">
+                    <button 
+                      onClick={() => {
+                        onClose();
+                        setTimeout(() => {
+                          onLoadingChange?.(true);
+                          setTimeout(() => {
+                            onSelect(selectedLocation, undefined);
+                            onLoadingChange?.(false);
+                          }, 1000);
+                        }, 100);
+                      }}
+                      className="flex-1 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                    >
+                      केवल जिला रखें
+                    </button>
+                    <button 
+                      onClick={onClose}
+                      className="flex-1 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                    >
+                      वर्तमान चयन रखें
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : showConstituencies ? (
               /* Constituency Selection Screen */
               <div className="p-4">
+                {/* Option to skip constituency selection */}
+                <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="text-sm font-medium text-amber-800 mb-1">केवल जिला चुनना चाहते हैं?</div>
+                      <div className="text-sm text-amber-600">निर्वाचन क्षेत्र वैकल्पिक है</div>
+                    </div>
+                    <button 
+                      onClick={() => handleDistrictOnlySelect(selectedDistrict!)}
+                      className="px-3 py-1.5 bg-amber-600 text-white text-sm rounded-md hover:bg-amber-700 transition-colors"
+                    >
+                      जिला चुनें
+                    </button>
+                  </div>
+                </div>
+
                 {showSearchResults ? (
                   <>
                     {filteredConstituencies.length > 0 ? (
@@ -500,7 +655,12 @@ export const LocationModal: React.FC<LocationModalProps> = ({
                               </svg>
                               <div>
                                 <div className="font-medium text-gray-900">{recent.district}</div>
-                                <div className="text-sm text-gray-600">{recent.constituency}</div>
+                                {recent.constituency && (
+                                  <div className="text-sm text-gray-600">{recent.constituency}</div>
+                                )}
+                                {!recent.constituency && (
+                                  <div className="text-sm text-gray-400">केवल जिला</div>
+                                )}
                               </div>
                               {idx === 0 && hasCurrentSelection && (
                                 <div className="ml-auto">
