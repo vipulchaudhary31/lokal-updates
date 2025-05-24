@@ -13,8 +13,8 @@ interface LayoutProps {
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   const [categoriesModalOpen, setCategoriesModalOpen] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState<string>('मुंबई शहर');
-  const [selectedConstituency, setSelectedConstituency] = useState<string>('मुंबई दक्षिण');
+  const [selectedLocation, setSelectedLocation] = useState<string>('नागपूर');
+  const [selectedConstituency, setSelectedConstituency] = useState<string>('कामठी');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [activeCategory, setActiveCategory] = useState<string>('1'); // Default to first tab
   const [isLocationLoading, setIsLocationLoading] = useState(false);

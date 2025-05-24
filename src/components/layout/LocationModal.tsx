@@ -256,34 +256,27 @@ export const LocationModal: React.FC<LocationModalProps> = ({
     setLocationError('');
 
     try {
-      if (!navigator.geolocation) {
-        throw new Error('Geolocation is not supported');
-      }
-
-      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 300000
-        });
-      });
-
-      // Close modal immediately
+      // Keep showing the location chip loader for 1 second before closing modal
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Close modal
       onClose();
       
       // Start loading after modal closes
       setTimeout(() => {
         onLoadingChange?.(true);
 
-        // Mock location detection - in real app, you'd use reverse geocoding
-        const defaultDistrict = maharashtraDistricts[0];
-        const defaultConstituency = defaultDistrict.constituencies[0];
+        // Hardcoded to Nashik district and Malegaon constituency
+        const nashikDistrict = maharashtraDistricts.find(d => d.id === 'nashik');
+        if (!nashikDistrict) {
+          throw new Error('District not found');
+        }
         
-        saveToRecentSearches(defaultDistrict.name, defaultConstituency);
+        saveToRecentSearches(nashikDistrict.name, 'मालेगांव');
         
         // Simulate loading delay
         setTimeout(() => {
-          onSelect(defaultDistrict.name, defaultConstituency);
+          onSelect(nashikDistrict.name, 'मालेगांव');
           onLoadingChange?.(false);
         }, 1500);
       }, 100);

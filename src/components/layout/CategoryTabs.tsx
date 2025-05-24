@@ -2,7 +2,7 @@ import React from 'react';
 
 const categories = [
   { id: 1, name: 'माझी बातमी' },
-  { id: 2, name: 'कर्नाटक' }, // Karnataka
+  { id: 2, name: 'महाराष्ट्र' }, // Karnataka
   { id: 3, name: 'राष्ट्रीय' }, // National
   { id: 4, name: 'व्हिडिओ' },
   { id: 5, name: 'मनोरंजन' },
