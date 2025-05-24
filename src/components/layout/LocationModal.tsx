@@ -336,9 +336,8 @@ export const LocationModal: React.FC<LocationModalProps> = ({
   // Show recent searches when: 
   // 1) Has recent searches AND 
   // 2) User hasn't selected from search results AND
-  // 3) Input is focused AND
-  // 4) No search text entered
-  const showRecentSearches = recentSearches.length > 0 && !hasSelectedFromSearch && isInputFocused && !search;
+  // 3) No search text entered (covers modal open, focused input, constituency changes, clearing input)
+  const showRecentSearches = recentSearches.length > 0 && !hasSelectedFromSearch && !search;
 
   return (
     <div className="absolute top-0 left-0 w-full h-full z-50 flex items-end justify-center bg-black/40">
