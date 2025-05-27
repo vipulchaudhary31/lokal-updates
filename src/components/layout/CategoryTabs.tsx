@@ -36,6 +36,11 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
     onTabChange(id.toString());
   };
 
+  const handleCategoriesModalOpen = () => {
+    // Just open the modal without changing the active category
+    openCategoriesModal();
+  };
+
   return (
     <div className="flex w-full items-center">
       {/* Location Dropdown Button */}
@@ -52,7 +57,7 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
         {/* First category: माझी बातमी */}
         <button
           key={categories[0].id}
-          className={`self-stretch min-h-9 text-sm text-white font-${activeCategory === categories[0].id.toString() ? 'semibold' : 'normal'} whitespace-nowrap text-center leading-none my-auto pt-0.5 px-2 rounded-[61px]`}
+          className={`self-stretch min-h-9 text-sm text-white ${activeCategory === categories[0].id.toString() ? 'font-semibold' : 'font-normal'} whitespace-nowrap text-center leading-none my-auto pt-0.5 px-2 rounded-[61px]`}
           onClick={() => handleTabClick(categories[0].id)}
         >
           {categories[0].name}
@@ -62,7 +67,7 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
         {selectedLocation && selectedLocation !== 'बेंगलुरु' && selectedLocation !== '' && (
           <button
             key="district"
-            className={`self-stretch min-h-9 text-sm text-white font-${activeCategory === 'district' ? 'semibold' : 'normal'} whitespace-nowrap text-center leading-none my-auto pt-0.5 px-2 rounded-[61px]`}
+            className={`self-stretch min-h-9 text-sm text-white ${activeCategory === 'district' ? 'font-semibold' : 'font-normal'} whitespace-nowrap text-center leading-none my-auto pt-0.5 px-2 rounded-[61px]`}
             onClick={() => handleTabClick('district')}
           >
             {selectedLocation}
@@ -73,7 +78,7 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
         {selectedConstituency && selectedConstituency !== '' && (
           <button
             key="constituency"
-            className={`self-stretch min-h-9 text-sm text-white font-${activeCategory === 'constituency' ? 'semibold' : 'normal'} whitespace-nowrap text-center leading-none my-auto pt-0.5 px-2 rounded-[61px]`}
+            className={`self-stretch min-h-9 text-sm text-white ${activeCategory === 'constituency' ? 'font-semibold' : 'font-normal'} whitespace-nowrap text-center leading-none my-auto pt-0.5 px-2 rounded-[61px]`}
             onClick={() => handleTabClick('constituency')}
           >
             {selectedConstituency}
@@ -84,7 +89,7 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
         {categories.slice(1).map((category) => (
           <button
             key={category.id}
-            className={`self-stretch min-h-9 text-sm text-white font-${activeCategory === category.id.toString() ? 'semibold' : 'normal'} whitespace-nowrap text-center leading-none my-auto pt-0.5 px-2 rounded-[61px]`}
+            className={`self-stretch min-h-9 text-sm text-white ${activeCategory === category.id.toString() ? 'font-semibold' : 'font-normal'} whitespace-nowrap text-center leading-none my-auto pt-0.5 px-2 rounded-[61px]`}
             onClick={() => handleTabClick(category.id)}
           >
             {category.name}
@@ -93,9 +98,9 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
 
         <button 
           className="self-stretch flex min-h-9 items-center gap-1 justify-center my-auto pt-0.5 px-2 rounded-[61px]"
-          onClick={openCategoriesModal}
+          onClick={handleCategoriesModalOpen}
         >
-          <span className="text-white text-sm font-normal leading-none text-center self-stretch my-auto">
+          <span className={`text-white text-sm leading-none text-center self-stretch my-auto whitespace-nowrap ${activeCategory === 'category' || selectedCategory ? 'font-semibold' : 'font-normal'}`}>
             {selectedCategory || 'सर्व श्रेणी'}
           </span>
           <div className="self-stretch flex items-center justify-center w-3 my-auto">

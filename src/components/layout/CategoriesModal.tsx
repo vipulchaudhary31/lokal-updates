@@ -1,21 +1,22 @@
 import React, { useState } from 'react';
 
+// Categories with appropriate icons
 const allCategories = [
-  'खेळ',
-  'राजकारण', 
-  'व्यापार',
-  'तंत्रज्ञान',
-  'आरोग्य',
-  'शिक्षण',
-  'कृषी',
-  'पर्यावरण',
-  'संस्कृती',
-  'धर्म',
-  'विज्ञान',
-  'कला',
-  'संगीत',
-  'चित्रपट',
-  'पुस्तके'
+  { name: 'खेळ', icon: '⚽' },
+  { name: 'राजकारण', icon: '🏛️' }, 
+  { name: 'व्यापार', icon: '💼' },
+  { name: 'तंत्रज्ञान', icon: '💻' },
+  { name: 'आरोग्य', icon: '🏥' },
+  { name: 'शिक्षण', icon: '📚' },
+  { name: 'कृषी', icon: '🌾' },
+  { name: 'पर्यावरण', icon: '🌱' },
+  { name: 'संस्कृती', icon: '🎭' },
+  { name: 'धर्म', icon: '🕉️' },
+  { name: 'विज्ञान', icon: '🔬' },
+  { name: 'कला', icon: '🎨' },
+  { name: 'संगीत', icon: '🎵' },
+  { name: 'चित्रपट', icon: '🎬' },
+  { name: 'पुस्तके', icon: '📖' }
 ];
 
 interface CategoriesModalProps {
@@ -40,65 +41,74 @@ export const CategoriesModal: React.FC<CategoriesModalProps> = ({
   if (!open) return null;
 
   const filteredCategories = allCategories.filter(category =>
-    category.toLowerCase().includes(search.toLowerCase())
+    category.name.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleCategorySelect = (category: string) => {
     onSelect(category);
-    onClose();
   };
 
   return (
-    <div className="absolute top-0 left-0 w-full h-full z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md flex flex-col p-0 overflow-hidden animate-slide-in-right max-h-[70vh]">
+    <div className="absolute top-0 left-0 w-full h-full z-50 flex items-end justify-center bg-black/40">
+      <div className="bg-white rounded-t-2xl shadow-xl w-full flex flex-col overflow-hidden animate-slide-in-bottom h-[80vh]">
+        
         {/* Header */}
-        <div className="flex flex-col p-4 pb-2">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">श्रेणी निवडा</h2>
-            <button onClick={onClose} className="p-1">
-              <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
+        <div className="flex items-center justify-between p-4 bg-white border-b border-gray-100">
+          <h2 className="text-xl font-semibold text-gray-900">श्रेणी निवडा</h2>
+          <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100 transition-colors">
+            <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
 
-          {/* Search Bar */}
-          <div className="mb-4">
+        <div className="flex-1 overflow-y-auto scrollbar-hide">
+          
+          {/* Search Input */}
+          <div className="px-4 py-6">
             <div className="relative">
               <input
                 type="text"
-                className="w-full rounded-lg border border-gray-300 py-2 pl-4 pr-10 text-base focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="श्रेणी शोधा"
+                className="w-full rounded-xl border-2 border-gray-200 py-4 pl-12 pr-4 text-base focus:outline-none focus:ring-0 focus:border-blue-300 bg-white hover:border-gray-300 transition-all"
+                placeholder="श्रेणी शोधा..."
                 value={search}
                 onChange={e => setSearch(e.target.value)}
               />
-              <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
+              <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+              </div>
             </div>
           </div>
 
           {/* Categories List */}
-          <div className="mb-4">
-            <div className="text-sm font-semibold mb-3 text-gray-700">सर्व श्रेणी</div>
-            <div className="max-h-64 overflow-y-auto scrollbar-hide">
-              <ul className="space-y-2">
+          <div className="px-4 pb-4">
+            {filteredCategories.length > 0 ? (
+              <div className="space-y-2">
                 {filteredCategories.map((category, idx) => (
-                  <li key={idx}>
-                    <button
-                      className="w-full text-left px-4 py-3 rounded-lg transition-colors hover:bg-gray-100 border border-gray-200"
-                      onClick={() => handleCategorySelect(category)}
-                    >
-                      <span className="font-medium text-gray-900">{category}</span>
-                    </button>
-                  </li>
+                  <button
+                    key={idx}
+                    className="w-full text-left p-4 rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200"
+                    onClick={() => handleCategorySelect(category.name)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="text-2xl">{category.icon}</div>
+                      <span className="font-medium text-gray-900">{category.name}</span>
+                    </div>
+                  </button>
                 ))}
-                {filteredCategories.length === 0 && (
-                  <li className="text-gray-400 px-4 py-2">श्रेणी सापडली नाही</li>
-                )}
-              </ul>
-            </div>
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <svg className="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                </svg>
+                <div className="text-gray-500 font-medium">कोई परिणाम नहीं मिला</div>
+                <div className="text-sm text-gray-400 mt-1">कुछ और खोजने का प्रयास करें</div>
+              </div>
+            )}
           </div>
         </div>
       </div>

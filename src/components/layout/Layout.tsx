@@ -17,6 +17,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [selectedConstituency, setSelectedConstituency] = useState<string>('कामठी');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [activeCategory, setActiveCategory] = useState<string>('1'); // Default to first tab
+  const [previousActiveCategory, setPreviousActiveCategory] = useState<string>('1'); // Track previous state
   const [isLocationLoading, setIsLocationLoading] = useState(false);
 
   const handleLocationSelect = (location: string, constituency?: string) => {
@@ -26,12 +27,18 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   const handleCategorySelect = (category: string) => {
     setSelectedCategory(category);
+    setActiveCategory('category'); // Set active category to indicate category is selected
+    setCategoriesModalOpen(false); // Close the modal when category is selected
   };
 
   const handleTabChange = (tabId: string) => {
+    // Store previous active category before changing (but not for categories modal)
+    if (tabId !== 'categories') {
+      setPreviousActiveCategory(activeCategory);
+    }
     setActiveCategory(tabId);
-    // Clear selected category when switching to main tabs
-    if (selectedCategory) {
+    // Clear selected category when switching to main tabs (but not when opening categories modal)
+    if (selectedCategory && tabId !== 'categories') {
       setSelectedCategory('');
     }
   };
@@ -86,7 +93,9 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           />
           <CategoriesModal
             open={categoriesModalOpen}
-            onClose={() => setCategoriesModalOpen(false)}
+            onClose={() => {
+              setCategoriesModalOpen(false);
+            }}
             onSelect={handleCategorySelect}
           />
         </div>
