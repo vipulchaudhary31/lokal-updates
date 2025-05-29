@@ -14,7 +14,6 @@ interface CategoryTabsProps {
   setSelectedLocation: (location: string) => void;
   openLocationModal: () => void;
   selectedConstituency: string;
-  openCategoriesModal: () => void;
   selectedCategory: string;
   activeCategory: string;
   onTabChange: (id: string) => void;
@@ -25,7 +24,6 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
   setSelectedLocation, 
   openLocationModal,
   selectedConstituency,
-  openCategoriesModal,
   selectedCategory,
   activeCategory,
   onTabChange
@@ -36,9 +34,9 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
     onTabChange(id.toString());
   };
 
-  const handleCategoriesModalOpen = () => {
-    // Just open the modal without changing the active category
-    openCategoriesModal();
+  const handleAllCategoriesClick = () => {
+    // Navigate to all categories page instead of opening modal
+    onTabChange('allCategories');
   };
 
   return (
@@ -46,10 +44,12 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
       {/* Location Dropdown Button */}
       <button 
         onClick={openLocationModal}
-        className="flex items-center gap-2 px-3 py-2 mr-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors"
+        className="flex items-center gap-1 px-3 py-1.5 mr-3 bg-white/10 rounded-lg hover:bg-white/20 transition-all duration-200"
       >
         <img src={`${baseUrl}icons/icon-location.svg`} alt="Location" className="w-4 h-4" />
-        <img src={`${baseUrl}icons/icon-dropdown.svg`} alt="Dropdown" className="w-3 h-3" />
+        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
       </button>
 
       {/* Category Tabs */}
@@ -96,16 +96,12 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
           </button>
         ))}
 
+        {/* All Categories Button - Simple button without dropdown */}
         <button 
-          className="self-stretch flex min-h-9 items-center gap-1 justify-center my-auto pt-0.5 px-2 rounded-[61px]"
-          onClick={handleCategoriesModalOpen}
+          className={`self-stretch min-h-9 text-sm text-white ${activeCategory === 'allCategories' ? 'font-semibold' : 'font-normal'} whitespace-nowrap text-center leading-none my-auto pt-0.5 px-2 rounded-[61px]`}
+          onClick={handleAllCategoriesClick}
         >
-          <span className={`text-white text-sm leading-none text-center self-stretch my-auto whitespace-nowrap ${activeCategory === 'category' || selectedCategory ? 'font-semibold' : 'font-normal'}`}>
-            {selectedCategory || 'सर्व श्रेणी'}
-          </span>
-          <div className="self-stretch flex items-center justify-center w-3 my-auto">
-            <img src={`${baseUrl}icons/icon-dropdown.svg`} alt="Dropdown" className="w-3 h-3" />
-          </div>
+          सर्व श्रेणी
         </button>
       </nav>
     </div>

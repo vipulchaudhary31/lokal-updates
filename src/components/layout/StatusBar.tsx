@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Signal, Wifi, Battery } from 'lucide-react';
 
